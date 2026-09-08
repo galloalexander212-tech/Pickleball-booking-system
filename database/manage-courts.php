@@ -6,6 +6,7 @@ require "validation.php";
 requireAdmin();
 
  $errors = [];
+ $editCourt = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -70,6 +71,92 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors = $validator->errors;
     }
 
+    /* ================= UPDATE COURT ================= */
+    if ($action === "update") {
+
+        $courtId  = (int)($_POST["court_id"] ?? 0);
+        $name     = trim($_POST["name"] ?? "");
+        $location = trim($_POST["location"] ?? "");
+        $rating   = (float)($_POST["rating"] ?? 0);
+
+        $validator = new Validator();
+
+        $validator->checkEmpty($name, "name", "Court name");
+        $validator->checkEmpty($location, "location", "Location");
+
+        if ($rating < 0 || $rating > 5) {
+            $validator->errors["rating"] = "Rating must be between 0 and 5.";
+        }
+
+        /* Duplicate name check — excluding THIS court */
+        if (!$validator->hasErrors()) {
+
+            $stmt = $conn->prepare("SELECT id FROM courts WHERE name = ? AND id != ? LIMIT 1");
+            $stmt->bind_param("si", $name, $courtId);
+            $stmt->execute();
+            $dup = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if ($dup) {
+                $validator->errors["name"] = "A court with that name already exists.";
+            }
+        }
+
+        /* New photo (optional) */
+        $imagePath = null;
+
+        if (!$validator->hasErrors() && !empty($_FILES["image"]["name"])) {
+
+            $imagePath = handleImageUpload($_FILES["image"], "courts");
+
+            if ($imagePath === null) {
+                $validator->errors["image"] = "Photo upload failed — use JPG, PNG, WEBP or GIF under 5MB.";
+            }
+        }
+
+        if (!$validator->hasErrors()) {
+
+            /* If a new photo arrived, delete the old file */
+            if ($imagePath !== null) {
+
+                $stmt = $conn->prepare("SELECT image FROM courts WHERE id = ? LIMIT 1");
+                $stmt->bind_param("i", $courtId);
+                $stmt->execute();
+                $old = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+
+                if ($old && !empty($old["image"]) && file_exists(__DIR__ . "/../" . $old["image"])) {
+                    unlink(__DIR__ . "/../" . $old["image"]);
+                }
+            }
+
+            /* Update — photo only if a new one was uploaded */
+            if ($imagePath !== null) {
+
+                $stmt = $conn->prepare("
+                    UPDATE courts SET name = ?, location = ?, rating = ?, image = ? WHERE id = ?
+                ");
+                $stmt->bind_param("ssdsi", $name, $location, $rating, $imagePath, $courtId);
+
+            } else {
+
+                $stmt = $conn->prepare("
+                    UPDATE courts SET name = ?, location = ?, rating = ? WHERE id = ?
+                ");
+                $stmt->bind_param("ssdi", $name, $location, $rating, $courtId);
+            }
+
+            $stmt->execute();
+            $stmt->close();
+
+            setFlash("Court updated!");
+            redirect("manage-courts.php");
+        }
+
+        $errors = $validator->errors;
+        $editCourt = ["id" => $courtId];   /* stay in edit mode after a failed save */
+    }
+
     /* ================= DELETE COURT ================= */
     if ($action === "delete") {
 
@@ -77,7 +164,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($courtId > 0) {
 
-            /* Grab the image so we can delete the file too */
             $stmt = $conn->prepare("SELECT image FROM courts WHERE id = ? LIMIT 1");
             $stmt->bind_param("i", $courtId);
             $stmt->execute();
@@ -100,10 +186,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
+/* ================= EDIT MODE (via ?edit=ID) ================= */
+
+if (isset($_GET["edit"])) {
+
+    $editId = (int)$_GET["edit"];
+
+    if ($editId > 0) {
+
+        $stmt = $conn->prepare("SELECT * FROM courts WHERE id = ? LIMIT 1");
+        $stmt->bind_param("i", $editId);
+        $stmt->execute();
+        $editCourt = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+    }
+}
+
 /* ================= FETCH COURTS ================= */
 
  $result = $conn->query("SELECT * FROM courts ORDER BY created_at DESC");
  $courts = $result->fetch_all(MYSQLI_ASSOC);
+
+ $isEdit = $editCourt !== null;
 ?>
 
 <!DOCTYPE html>
@@ -189,16 +293,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
 
-        <!-- CREATE COURT FORM -->
+        <!-- CREATE / EDIT COURT FORM -->
 
         <h3 class="admin-section-title">
-            ADD A COURT
+            <?= $isEdit ? "EDIT COURT — " . e($editCourt["name"]) : "ADD A COURT" ?>
         </h3>
 
         <form method="POST" action="manage-courts.php"
               enctype="multipart/form-data" class="admin-form">
 
-            <input type="hidden" name="action" value="create">
+            <input type="hidden" name="action" value="<?= $isEdit ? "update" : "create" ?>">
+
+            <?php if ($isEdit): ?>
+                <input type="hidden" name="court_id" value="<?= (int)$editCourt["id"] ?>">
+            <?php endif; ?>
+
 
             <div class="form-group">
 
@@ -206,7 +315,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="text"
                        name="name"
-                       value="<?= old("name") ?>"
+                       value="<?= $isEdit ? e($editCourt["name"]) : old("name") ?>"
                        placeholder="e.g. Skyline Pickleball Club">
 
                 <?php if (isset($errors["name"])): ?>
@@ -222,7 +331,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="text"
                        name="location"
-                       value="<?= old("location") ?>"
+                       value="<?= $isEdit ? e($editCourt["location"]) : old("location") ?>"
                        placeholder="e.g. Dumaguete City">
 
                 <?php if (isset($errors["location"])): ?>
@@ -241,7 +350,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                        step="0.1"
                        min="0"
                        max="5"
-                       value="<?= old("rating") ?: "4.5" ?>">
+                       value="<?= $isEdit ? e($editCourt["rating"]) : (old("rating") ?: "4.5") ?>">
 
                 <?php if (isset($errors["rating"])): ?>
                     <p class="field-error"><?= e($errors["rating"]) ?></p>
@@ -252,7 +361,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="form-group">
 
-                <label>PHOTO (OPTIONAL)</label>
+                <label>PHOTO <?= $isEdit ? "(LEAVE EMPTY TO KEEP CURRENT)" : "(OPTIONAL)" ?></label>
 
                 <input type="file"
                        name="image"
@@ -268,12 +377,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="form-group">
 
                 <button type="submit" class="auth-btn">
-                    ADD COURT
+                    <?= $isEdit ? "SAVE CHANGES" : "ADD COURT" ?>
                 </button>
 
             </div>
 
         </form>
+
+        <?php if ($isEdit): ?>
+
+            <p class="edit-note">
+                Editing <strong><?= e($editCourt["name"]) ?></strong> —
+                <a href="manage-courts.php">cancel</a>
+            </p>
+
+        <?php endif; ?>
 
 
         <!-- COURTS TABLE -->
@@ -338,6 +456,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <td>★ <?= e(number_format((float)$c["rating"], 1)) ?></td>
 
                                 <td>
+
+                                    <a href="manage-courts.php?edit=<?= (int)$c["id"] ?>" class="small-btn">
+                                        EDIT
+                                    </a>
 
                                     <form method="POST" action="manage-courts.php" class="row-form"
                                           onsubmit="return confirm('Delete this court?')">

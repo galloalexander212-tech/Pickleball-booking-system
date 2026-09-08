@@ -1544,3 +1544,23 @@ body {
 
     font-size: 16px;
 }
+
+/* =====================================
+   EDIT MODE NOTE
+===================================== */
+
+.edit-note {
+
+    font-size: 13px;
+
+    color: var(--gray);
+
+    margin: -10px 0 18px;
+}
+
+.edit-note a {
+
+    color: var(--lime);
+
+    font-weight: 700;
+}

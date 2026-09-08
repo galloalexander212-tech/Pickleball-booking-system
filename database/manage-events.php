@@ -6,6 +6,7 @@ require "validation.php";
 requireAdmin();
 
  $errors = [];
+ $editEvent = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -71,6 +72,105 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors = $validator->errors;
     }
 
+    /* ================= UPDATE EVENT ================= */
+    if ($action === "update") {
+
+        $eventId     = (int)($_POST["event_id"] ?? 0);
+        $type        = $_POST["type"] ?? "";
+        $title       = trim($_POST["title"] ?? "");
+        $description = trim($_POST["description"] ?? "");
+        $location    = trim($_POST["location"] ?? "");
+        $date        = trim($_POST["date"] ?? "");
+        $time        = trim($_POST["time"] ?? "");
+        $maxPlayers  = (int)($_POST["max_players"] ?? 0);
+        $prize       = trim($_POST["prize"] ?? "");
+
+        $validator = new Validator();
+
+        $validator->checkEmpty($title, "title", "Title");
+        $validator->checkEmpty($location, "location", "Location");
+        $validator->checkEmpty($date, "date", "Date");
+        $validator->checkEmpty($time, "time", "Time");
+
+        if (!in_array($type, ["open_play", "tournament"], true)) {
+            $validator->errors["type"] = "Pick a valid event type.";
+        }
+
+        if ($maxPlayers < 2 || $maxPlayers > 64) {
+            $validator->errors["max_players"] = "Max players must be between 2 and 64.";
+        }
+
+        /* New photo (optional) */
+        $imagePath = null;
+
+        if (!$validator->hasErrors() && !empty($_FILES["image"]["name"])) {
+
+            $imagePath = handleImageUpload($_FILES["image"], "events");
+
+            if ($imagePath === null) {
+                $validator->errors["image"] = "Photo upload failed — use JPG, PNG, WEBP or GIF under 5MB.";
+            }
+        }
+
+        if (!$validator->hasErrors()) {
+
+            /* If a new photo arrived, delete the old file */
+            if ($imagePath !== null) {
+
+                $stmt = $conn->prepare("SELECT image FROM events WHERE id = ? LIMIT 1");
+                $stmt->bind_param("i", $eventId);
+                $stmt->execute();
+                $old = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+
+                if ($old && !empty($old["image"]) && file_exists(__DIR__ . "/../" . $old["image"])) {
+                    unlink(__DIR__ . "/../" . $old["image"]);
+                }
+            }
+
+            if ($imagePath !== null) {
+
+                $stmt = $conn->prepare("
+                    UPDATE events
+                    SET type = ?, title = ?, description = ?, location = ?,
+                        event_date = ?, event_time = ?, max_players = ?, prize = ?, image = ?
+                    WHERE id = ?
+                ");
+                $stmt->bind_param("ssssssissi", $type, $title, $description, $location, $date, $time, $maxPlayers, $prize, $imagePath, $eventId);
+
+            } else {
+
+                $stmt = $conn->prepare("
+                    UPDATE events
+                    SET type = ?, title = ?, description = ?, location = ?,
+                        event_date = ?, event_time = ?, max_players = ?, prize = ?
+                    WHERE id = ?
+                ");
+                $stmt->bind_param("ssssssisi", $type, $title, $description, $location, $date, $time, $maxPlayers, $prize, $eventId);
+            }
+
+            $stmt->execute();
+            $stmt->close();
+
+            setFlash("Event updated!");
+            redirect("manage-events.php");
+        }
+
+          $errors = $validator->errors;
+
+ $editEvent = [
+    "id"          => $eventId,
+    "type"        => $type,
+    "title"       => $title,
+    "description" => $description,
+    "location"    => $location,
+    "event_date"  => $date,
+    "event_time"  => $time,
+    "max_players" => $maxPlayers,
+    "prize"       => $prize,
+];
+    }
+
     /* ================= DELETE EVENT ================= */
     if ($action === "delete") {
 
@@ -78,7 +178,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($eventId > 0) {
 
-            /* Grab image so we can delete the file too */
             $stmt = $conn->prepare("SELECT image FROM events WHERE id = ? LIMIT 1");
             $stmt->bind_param("i", $eventId);
             $stmt->execute();
@@ -102,6 +201,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
+/* ================= EDIT MODE (via ?edit=ID) ================= */
+
+if (isset($_GET["edit"])) {
+
+    $editId = (int)$_GET["edit"];
+
+    if ($editId > 0) {
+
+        $stmt = $conn->prepare("SELECT * FROM events WHERE id = ? LIMIT 1");
+        $stmt->bind_param("i", $editId);
+        $stmt->execute();
+        $editEvent = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+    }
+}
+
 /* ================= FETCH ALL EVENTS ================= */
 
  $result = $conn->query("
@@ -113,6 +228,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ");
 
  $events = $result->fetch_all(MYSQLI_ASSOC);
+
+ $isEdit = $editEvent !== null;
 ?>
 
 <!DOCTYPE html>
@@ -198,16 +315,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
 
-        <!-- CREATE EVENT FORM -->
+        <!-- CREATE / EDIT EVENT FORM -->
 
         <h3 class="admin-section-title">
-            CREATE AN EVENT
+            <?= $isEdit ? "EDIT EVENT — " . e($editEvent["title"]) : "CREATE AN EVENT" ?>
         </h3>
 
         <form method="POST" action="manage-events.php"
               enctype="multipart/form-data" class="admin-form">
 
-            <input type="hidden" name="action" value="create">
+            <input type="hidden" name="action" value="<?= $isEdit ? "update" : "create" ?>">
+
+            <?php if ($isEdit): ?>
+                <input type="hidden" name="event_id" value="<?= (int)$editEvent["id"] ?>">
+            <?php endif; ?>
+
 
             <div class="form-group">
 
@@ -215,11 +337,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <select name="type">
 
-                    <option value="open_play">
+                    <option value="open_play" <?= $isEdit && $editEvent["type"] === "open_play" ? "selected" : "" ?>>
                         Open Play
                     </option>
 
-                    <option value="tournament">
+                    <option value="tournament" <?= $isEdit && $editEvent["type"] === "tournament" ? "selected" : "" ?>>
                         Tournament
                     </option>
 
@@ -238,7 +360,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="text"
                        name="title"
-                       value="<?= old("title") ?>"
+                       value="<?= $isEdit ? e($editEvent["title"]) : old("title") ?>"
                        placeholder="Saturday Morning Smash">
 
                 <?php if (isset($errors["title"])): ?>
@@ -254,7 +376,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="text"
                        name="location"
-                       value="<?= old("location") ?>"
+                       value="<?= $isEdit ? e($editEvent["location"]) : old("location") ?>"
                        placeholder="Dumaguete City">
 
                 <?php if (isset($errors["location"])): ?>
@@ -270,8 +392,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="date"
                        name="date"
-                       value="<?= old("date") ?>"
-                       min="<?= date("Y-m-d") ?>">
+                       value="<?= $isEdit ? e($editEvent["event_date"]) : old("date") ?>">
 
                 <?php if (isset($errors["date"])): ?>
                     <p class="field-error"><?= e($errors["date"]) ?></p>
@@ -286,7 +407,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="time"
                        name="time"
-                       value="<?= old("time") ?>">
+                       value="<?= $isEdit ? e(substr($editEvent["event_time"], 0, 5)) : old("time") ?>">
 
                 <?php if (isset($errors["time"])): ?>
                     <p class="field-error"><?= e($errors["time"]) ?></p>
@@ -301,7 +422,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="number"
                        name="max_players"
-                       value="<?= old("max_players") ?: "8" ?>"
+                       value="<?= $isEdit ? (int)$editEvent["max_players"] : (old("max_players") ?: "8") ?>"
                        min="2"
                        max="64">
 
@@ -318,7 +439,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="text"
                        name="prize"
-                       value="<?= old("prize") ?>"
+                       value="<?= $isEdit ? e($editEvent["prize"]) : old("prize") ?>"
                        placeholder="₱5,000 + bragging rights">
 
                 <?php if (isset($errors["prize"])): ?>
@@ -330,7 +451,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="form-group">
 
-                <label>PHOTO (OPTIONAL)</label>
+                <label>PHOTO <?= $isEdit ? "(LEAVE EMPTY TO KEEP CURRENT)" : "(OPTIONAL)" ?></label>
 
                 <input type="file"
                        name="image"
@@ -349,7 +470,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <input type="text"
                        name="description"
-                       value="<?= old("description") ?>"
+                       value="<?= $isEdit ? e($editEvent["description"]) : old("description") ?>"
                        placeholder="All levels welcome — paddles provided!">
 
             </div>
@@ -358,12 +479,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="form-group">
 
                 <button type="submit" class="auth-btn">
-                    CREATE EVENT
+                    <?= $isEdit ? "SAVE CHANGES" : "CREATE EVENT" ?>
                 </button>
 
             </div>
 
         </form>
+
+        <?php if ($isEdit): ?>
+
+            <p class="edit-note">
+                Editing <strong><?= e($editEvent["title"]) ?></strong> —
+                <a href="manage-events.php">cancel</a>
+            </p>
+
+        <?php endif; ?>
 
 
         <!-- ALL EVENTS TABLE -->
@@ -450,6 +580,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 </td>
 
                                 <td>
+
+                                    <a href="manage-events.php?edit=<?= (int)$ev["id"] ?>" class="small-btn">
+                                        EDIT
+                                    </a>
 
                                     <form method="POST" action="manage-events.php" class="row-form"
                                           onsubmit="return confirm('Delete this event? All joins will be removed too.')">
