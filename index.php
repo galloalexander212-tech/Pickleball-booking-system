@@ -845,7 +845,7 @@ if (isLoggedIn()) {
                         $hasJoined = in_array((int)$ev["id"], $joinedIds);
                     ?>
 
-                    <article class="event-card">
+                    <article class="event-card<?= !empty($ev["image"]) ? " event-card-photo" : "" ?>">
 
                         <div class="event-top">
 
@@ -1091,7 +1091,7 @@ if (isLoggedIn()) {
                         $hasJoined = in_array((int)$ev["id"], $joinedIds);
                     ?>
 
-                    <article class="event-card">
+                    <article class="event-card<?= !empty($ev["image"]) ? " event-card-photo" : "" ?>">
 
                         <div class="event-top">
 
