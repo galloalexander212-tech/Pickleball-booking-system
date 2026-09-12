@@ -4226,3 +4226,45 @@ footer {
 
     font-family: "Alef", sans-serif;
 }
+
+/* =====================================
+   EVENT CARDS — TEXT PLATE
+   sharp photo • frosted box behind text
+===================================== */
+
+/* kill the old full-card veil for good */
+
+.event-card-photo::before {
+
+    display: none;
+}
+
+
+/* plate base — keeps inner spacing on ALL cards */
+
+.event-text-plate {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+/* glass look only when the card has a photo */
+
+.event-card-photo .event-text-plate {
+
+    background: rgba(10, 13, 10, 0.55);
+
+    backdrop-filter: blur(6px);
+
+    -webkit-backdrop-filter: blur(6px);
+
+    border-radius: 10px;
+
+    padding: 14px 16px;
+
+    margin: 0;
+}

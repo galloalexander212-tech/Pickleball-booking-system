@@ -49,15 +49,13 @@ if (isLoggedIn()) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Alike+Angular&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
-
-<!-- FLASH MESSAGE -->
 
 <?php $flash = getFlash(); ?>
 
@@ -69,8 +67,6 @@ if (isLoggedIn()) {
 
 <?php endif; ?>
 
-
-<!-- NAVBAR -->
 
 <header class="navbar">
 
@@ -134,8 +130,6 @@ if (isLoggedIn()) {
 </header>
 
 
-<!-- MOBILE NAV -->
-
 <div class="mobile-menu" id="mobileMenu">
 
     <a href="index.php">HOME</a>
@@ -152,8 +146,6 @@ if (isLoggedIn()) {
 
 </div>
 
-
-<!-- PAGE HERO STRIP -->
 
 <section class="page-hero">
 
@@ -176,8 +168,6 @@ if (isLoggedIn()) {
 
 </section>
 
-
-<!-- OPEN PLAYS LISTING -->
 
 <section class="open-play">
 
@@ -218,30 +208,37 @@ if (isLoggedIn()) {
 
                         </div>
 
+
                         <?php if (!empty($ev["image"])): ?>
 
-    <div class="event-image">
-        <img src="<?= e($ev["image"]) ?>" alt="<?= e($ev["title"]) ?>">
-    </div>
-
-<?php endif; ?>
-                        <h3><?= e($ev["title"]) ?></h3>
-
-                        <p class="event-meta">
-                            📅 <?= e(date("D, M j, Y", strtotime($ev["event_date"]))) ?>
-                            &nbsp;•&nbsp;
-                            🕐 <?= e(date("g:i A", strtotime($ev["event_time"]))) ?>
-                        </p>
-
-                        <p class="event-meta">
-                            ◉ <?= e($ev["location"]) ?>
-                        </p>
-
-                        <?php if ($ev["description"]): ?>
-
-                            <p class="event-desc"><?= e($ev["description"]) ?></p>
+                            <div class="event-image">
+                                <img src="<?= e($ev["image"]) ?>" alt="<?= e($ev["title"]) ?>">
+                            </div>
 
                         <?php endif; ?>
+
+
+                        <div class="event-text-plate">
+
+                            <h3><?= e($ev["title"]) ?></h3>
+
+                            <p class="event-meta">
+                                📅 <?= e(date("D, M j, Y", strtotime($ev["event_date"]))) ?>
+                                &nbsp;•&nbsp;
+                                🕐 <?= e(date("g:i A", strtotime($ev["event_time"]))) ?>
+                            </p>
+
+                            <p class="event-meta">
+                                ◉ <?= e($ev["location"]) ?>
+                            </p>
+
+                            <?php if ($ev["description"]): ?>
+
+                                <p class="event-desc"><?= e($ev["description"]) ?></p>
+
+                            <?php endif; ?>
+
+                        </div>
 
 
                         <div class="event-bottom">
@@ -291,16 +288,10 @@ if (isLoggedIn()) {
 </section>
 
 
-<!-- =========================
-     FOOTER
-========================= -->
-
 <footer>
 
     <div class="footer-container">
 
-
-        <!-- BRAND COLUMN -->
 
         <div class="footer-brand">
 
@@ -347,8 +338,6 @@ if (isLoggedIn()) {
         </div>
 
 
-        <!-- QUICK LINKS -->
-
         <div class="footer-col">
 
             <h4>
@@ -365,8 +354,6 @@ if (isLoggedIn()) {
         </div>
 
 
-        <!-- SUPPORT -->
-
         <div class="footer-col">
 
             <h4>
@@ -380,8 +367,6 @@ if (isLoggedIn()) {
 
         </div>
 
-
-        <!-- CONTACT US -->
 
         <div class="footer-col footer-contact">
 
@@ -434,8 +419,6 @@ if (isLoggedIn()) {
 
     </div>
 
-
-    <!-- BOTTOM BAR -->
 
     <div class="footer-bottom">
 

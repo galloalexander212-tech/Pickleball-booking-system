@@ -3,6 +3,7 @@ require "database/config.php";
 require "database/function.php";
 
  $page = "home";
+
 /* =========================
    DATA LOADING
 ========================= */
@@ -75,7 +76,7 @@ if (isLoggedIn()) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Alike+Angular&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 
@@ -106,16 +107,12 @@ if (isLoggedIn()) {
 
     <div class="nav-container">
 
-        <!-- LOGO -->
-
         <a href="index.php" class="logo">
 
             <img src="images/logo.png" alt="PICKLE" class="logo-img">
 
         </a>
 
-
-        <!-- DESKTOP NAVIGATION -->
 
         <nav class="nav-links">
 
@@ -146,8 +143,6 @@ if (isLoggedIn()) {
         </nav>
 
 
-        <!-- LOGIN / ACCOUNT -->
-
         <?php if (isLoggedIn()): ?>
 
             <a href="database/info.php" class="login-btn">
@@ -162,8 +157,6 @@ if (isLoggedIn()) {
 
         <?php endif; ?>
 
-
-        <!-- MOBILE MENU -->
 
         <button class="menu-btn" id="menuBtn">
             ☰
@@ -256,8 +249,6 @@ if (isLoggedIn()) {
     <div class="quick-container">
 
 
-        <!-- BOOK COURTS -->
-
         <div class="quick-item">
 
             <div class="quick-icon">
@@ -287,8 +278,6 @@ if (isLoggedIn()) {
         </div>
 
 
-        <!-- OPEN PLAYS -->
-
         <div class="quick-item">
 
             <div class="quick-icon">
@@ -317,8 +306,6 @@ if (isLoggedIn()) {
 
         </div>
 
-
-        <!-- TOURNAMENTS -->
 
         <div class="quick-item">
 
@@ -380,8 +367,6 @@ if (isLoggedIn()) {
         <div class="search-box">
 
 
-            <!-- LOCATION -->
-
             <div class="search-field">
 
                 <label>
@@ -397,8 +382,6 @@ if (isLoggedIn()) {
             </div>
 
 
-            <!-- DATE -->
-
             <div class="search-field">
 
                 <label>
@@ -412,8 +395,6 @@ if (isLoggedIn()) {
 
             </div>
 
-
-            <!-- PLAYERS -->
 
             <div class="search-field">
 
@@ -443,8 +424,6 @@ if (isLoggedIn()) {
 
             </div>
 
-
-            <!-- SEARCH -->
 
             <button
                 class="search-btn"
@@ -590,8 +569,6 @@ if (isLoggedIn()) {
         <div class="steps">
 
 
-            <!-- STEP 1 -->
-
             <div class="step">
 
                 <div class="step-icon">
@@ -614,8 +591,6 @@ if (isLoggedIn()) {
 
             </div>
 
-
-            <!-- STEP 2 -->
 
             <div class="step">
 
@@ -642,8 +617,6 @@ if (isLoggedIn()) {
             </div>
 
 
-            <!-- STEP 3 -->
-
             <div class="step">
 
                 <div class="step-icon">
@@ -667,8 +640,6 @@ if (isLoggedIn()) {
 
             </div>
 
-
-            <!-- STEP 4 -->
 
             <div class="step">
 
@@ -715,8 +686,6 @@ if (isLoggedIn()) {
 
         <div class="op-banner">
 
-            <!-- LEFT: TEXT -->
-
             <div class="op-text">
 
                 <p class="op-eyebrow">
@@ -742,8 +711,6 @@ if (isLoggedIn()) {
 
             </div>
 
-
-            <!-- RIGHT: PHOTO BACKDROP + GLASS CARD -->
 
             <div class="op-photo">
 
@@ -822,10 +789,6 @@ if (isLoggedIn()) {
     </div>
 
 
-    <!-- =========================
-         OPEN PLAY LISTINGS
-    ========================= -->
-
     <div class="section-container event-list" id="openPlayList">
 
         <?php if (empty($openPlays)): ?>
@@ -873,25 +836,29 @@ if (isLoggedIn()) {
                         <?php endif; ?>
 
 
-                        <h3><?= e($ev["title"]) ?></h3>
+                        <div class="event-text-plate">
 
-                        <p class="event-meta">
-                            📅 <?= e(date("D, M j, Y", strtotime($ev["event_date"]))) ?>
-                            &nbsp;•&nbsp;
-                            🕐 <?= e(date("g:i A", strtotime($ev["event_time"]))) ?>
-                        </p>
+                            <h3><?= e($ev["title"]) ?></h3>
 
-                        <p class="event-meta">
-                            ◉ <?= e($ev["location"]) ?>
-                        </p>
-
-                        <?php if ($ev["description"]): ?>
-
-                            <p class="event-desc">
-                                <?= e($ev["description"]) ?>
+                            <p class="event-meta">
+                                📅 <?= e(date("D, M j, Y", strtotime($ev["event_date"]))) ?>
+                                &nbsp;•&nbsp;
+                                🕐 <?= e(date("g:i A", strtotime($ev["event_time"]))) ?>
                             </p>
 
-                        <?php endif; ?>
+                            <p class="event-meta">
+                                ◉ <?= e($ev["location"]) ?>
+                            </p>
+
+                            <?php if ($ev["description"]): ?>
+
+                                <p class="event-desc">
+                                    <?= e($ev["description"]) ?>
+                                </p>
+
+                            <?php endif; ?>
+
+                        </div>
 
 
                         <div class="event-bottom">
@@ -960,8 +927,6 @@ if (isLoggedIn()) {
 
         <div class="tour-banner">
 
-            <!-- PHOTO BACKDROP -->
-
             <div class="tour-photo">
 
                 <img src="images/tournament-photo.jpg"
@@ -970,8 +935,6 @@ if (isLoggedIn()) {
 
             </div>
 
-
-            <!-- LEFT: TEXT -->
 
             <div class="tour-text">
 
@@ -997,8 +960,6 @@ if (isLoggedIn()) {
 
             </div>
 
-
-            <!-- RIGHT: GLASS CARD -->
 
             <div class="op-card">
 
@@ -1068,10 +1029,6 @@ if (isLoggedIn()) {
     </div>
 
 
-    <!-- =========================
-         TOURNAMENT LISTINGS
-    ========================= -->
-
     <div class="section-container event-list" id="tournamentList">
 
         <?php if (empty($tournaments)): ?>
@@ -1119,33 +1076,37 @@ if (isLoggedIn()) {
                         <?php endif; ?>
 
 
-                        <h3><?= e($ev["title"]) ?></h3>
+                        <div class="event-text-plate">
 
-                        <p class="event-meta">
-                            📅 <?= e(date("D, M j, Y", strtotime($ev["event_date"]))) ?>
-                            &nbsp;•&nbsp;
-                            🕐 <?= e(date("g:i A", strtotime($ev["event_time"]))) ?>
-                        </p>
+                            <h3><?= e($ev["title"]) ?></h3>
 
-                        <p class="event-meta">
-                            ◉ <?= e($ev["location"]) ?>
-                        </p>
-
-                        <?php if ($ev["description"]): ?>
-
-                            <p class="event-desc">
-                                <?= e($ev["description"]) ?>
+                            <p class="event-meta">
+                                📅 <?= e(date("D, M j, Y", strtotime($ev["event_date"]))) ?>
+                                &nbsp;•&nbsp;
+                                🕐 <?= e(date("g:i A", strtotime($ev["event_time"]))) ?>
                             </p>
 
-                        <?php endif; ?>
-
-                        <?php if ($ev["prize"]): ?>
-
-                            <p class="event-prize">
-                                🏆 <?= e($ev["prize"]) ?>
+                            <p class="event-meta">
+                                ◉ <?= e($ev["location"]) ?>
                             </p>
 
-                        <?php endif; ?>
+                            <?php if ($ev["description"]): ?>
+
+                                <p class="event-desc">
+                                    <?= e($ev["description"]) ?>
+                                </p>
+
+                            <?php endif; ?>
+
+                            <?php if ($ev["prize"]): ?>
+
+                                <p class="event-prize">
+                                    🏆 <?= e($ev["prize"]) ?>
+                                </p>
+
+                            <?php endif; ?>
+
+                        </div>
 
 
                         <div class="event-bottom">
@@ -1375,8 +1336,6 @@ if (isLoggedIn()) {
     <div class="footer-container">
 
 
-        <!-- BRAND COLUMN -->
-
         <div class="footer-brand">
 
             <img src="images/logo.png" alt="PICKLE" class="footer-logo-img">
@@ -1422,8 +1381,6 @@ if (isLoggedIn()) {
         </div>
 
 
-        <!-- QUICK LINKS -->
-
         <div class="footer-col">
 
             <h4>
@@ -1440,8 +1397,6 @@ if (isLoggedIn()) {
         </div>
 
 
-        <!-- SUPPORT -->
-
         <div class="footer-col">
 
             <h4>
@@ -1455,8 +1410,6 @@ if (isLoggedIn()) {
 
         </div>
 
-
-        <!-- CONTACT US -->
 
         <div class="footer-col footer-contact">
 
@@ -1509,8 +1462,6 @@ if (isLoggedIn()) {
 
     </div>
 
-
-    <!-- BOTTOM BAR -->
 
     <div class="footer-bottom">
 
