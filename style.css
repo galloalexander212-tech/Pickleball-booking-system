@@ -4191,3 +4191,38 @@ footer {
 
 /* no photo? card stays exactly as it was
    (no .event-card-photo class = old styles) */
+
+/* =====================================
+   NUMBERS — TIMES NEW ROMAN (SITE-WIDE)
+   every numeric element, all pages
+   hero + motto stay Alef
+===================================== */
+
+.op-photo-stat strong,
+.player-count strong,
+.stat-box strong,
+.event-slots,
+.event-meta,
+.event-prize,
+.op-card-line,
+.booking-item .meta,
+.profile-row strong,
+.rating,
+.slot-btn,
+.search-message,
+.booking-message,
+.flash,
+.footer-contact-row a[href^="tel"],
+.contact-box a[href^="tel"],
+.footer-bottom-inner {
+
+    font-family: "Times New Roman", Times, serif;
+}
+
+
+/* motto keeps Alef (inherits otherwise) */
+
+.footer-motto {
+
+    font-family: "Alef", sans-serif;
+}

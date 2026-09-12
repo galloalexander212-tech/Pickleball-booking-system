@@ -1564,3 +1564,18 @@ body {
 
     font-weight: 700;
 }
+
+/* =====================================
+   NUMBERS — TIMES (AUTH PAGES)
+===================================== */
+
+.profile-row strong,
+
+.booking-item .meta,
+
+.auth-alert,
+
+.flash {
+
+    font-family: "Times New Roman", Times, serif;
+}
