@@ -4268,3 +4268,19 @@ footer {
 
     margin: 0;
 }
+
+/* =====================================
+   TEXT PLATE — fit-content
+   box hugs the text, not the card
+===================================== */
+
+.event-card-photo .event-text-plate {
+
+    align-self: flex-start;
+
+    width: fit-content;
+
+    max-width: calc(100% - 24px);
+
+    margin: 0 0 0 16px;
+}
