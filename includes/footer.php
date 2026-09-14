@@ -19,9 +19,9 @@
             </p>
 
 
-            <div class="footer-socials">
+                       <div class="footer-socials">
 
-                <a href="#" aria-label="Facebook">
+                <a href="https://www.facebook.com/p/Alexander-Gallo-61584661173083/" target="_blank" rel="noopener" aria-label="Facebook">
 
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
@@ -30,7 +30,7 @@
                 </a>
 
 
-                <a href="#" aria-label="Instagram">
+                <a href="https://www.instagram.com/aalxnndr" target="_blank" rel="noopener" aria-label="Instagram">
 
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
@@ -41,7 +41,7 @@
                 </a>
 
 
-                <a href="#" aria-label="TikTok">
+                <a href="https://www.tiktok.com/@alxsixander?_r=1&_t=ZS-99jMCkmjFrg" target="_blank" rel="noopener" aria-label="TikTok">
 
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
