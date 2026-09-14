@@ -749,9 +749,43 @@ if (isLoggedIn()) {
                         👥 <?= (int)$nextPlay["joined_count"] ?> / <?= (int)$nextPlay["max_players"] ?> slots filled
                     </p>
 
-                    <a href="#openPlayList" class="op-card-btn">
-                        JOIN NOW
-                    </a>
+                                       <?php
+                        $nextIsFull    = (int)$nextPlay["joined_count"] >= (int)$nextPlay["max_players"];
+                        $nextHasJoined = in_array((int)$nextPlay["id"], $joinedIds);
+                    ?>
+
+                    <?php if ($nextHasJoined): ?>
+
+                        <span class="op-card-btn op-card-btn-state">
+                            YOU'RE IN ✓
+                        </span>
+
+                    <?php elseif ($nextIsFull): ?>
+
+                        <span class="op-card-btn op-card-btn-state full">
+                            FULL
+                        </span>
+
+                    <?php elseif (!isLoggedIn()): ?>
+
+                        <a href="database/index.php?notice=login-event" class="op-card-btn">
+                            JOIN NOW
+                        </a>
+
+                    <?php else: ?>
+
+                        <form method="POST" action="database/events.php">
+
+                            <input type="hidden" name="action" value="join">
+                            <input type="hidden" name="event_id" value="<?= (int)$nextPlay["id"] ?>">
+
+                            <button type="submit" class="op-card-btn">
+                                JOIN NOW
+                            </button>
+
+                        </form>
+
+                    <?php endif; ?>S
 
                 <?php else: ?>
 
@@ -997,9 +1031,43 @@ if (isLoggedIn()) {
 
                     <?php endif; ?>
 
-                    <a href="#tournamentList" class="op-card-btn">
-                        REGISTER NOW
-                    </a>
+                                       <?php
+                        $nextTIsFull    = (int)$nextT["joined_count"] >= (int)$nextT["max_players"];
+                        $nextTHasJoined = in_array((int)$nextT["id"], $joinedIds);
+                    ?>
+
+                    <?php if ($nextTHasJoined): ?>
+
+                        <span class="op-card-btn op-card-btn-state">
+                            YOU'RE IN ✓
+                        </span>
+
+                    <?php elseif ($nextTIsFull): ?>
+
+                        <span class="op-card-btn op-card-btn-state full">
+                            FULL
+                        </span>
+
+                    <?php elseif (!isLoggedIn()): ?>
+
+                        <a href="database/index.php?notice=login-event" class="op-card-btn">
+                            REGISTER NOW
+                        </a>
+
+                    <?php else: ?>
+
+                        <form method="POST" action="database/events.php">
+
+                            <input type="hidden" name="action" value="join">
+                            <input type="hidden" name="event_id" value="<?= (int)$nextT["id"] ?>">
+
+                            <button type="submit" class="op-card-btn">
+                                REGISTER NOW
+                            </button>
+
+                        </form>
+
+                    <?php endif; ?>
 
                 <?php else: ?>
 

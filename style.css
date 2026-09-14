@@ -4284,3 +4284,38 @@ footer {
 
     margin: 0 0 0 16px;
 }
+
+/* =====================================
+   GLASS CARD JOIN BUTTON
+   button reset + joined/full states
+===================================== */
+
+button.op-card-btn {
+
+    border: none;
+
+    cursor: pointer;
+
+    font-family: "Alef", sans-serif;
+}
+
+
+/* quiet state chip (YOU'RE IN / FULL) */
+
+.op-card-btn-state {
+
+    background: transparent;
+
+    border: 1px solid rgba(155, 234, 0, 0.35);
+
+    color: var(--lime);
+
+    cursor: default;
+}
+
+.op-card-btn-state.full {
+
+    color: #ff8a7a;
+
+    border-color: rgba(255, 138, 122, 0.40);
+}
