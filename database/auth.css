@@ -1579,3 +1579,49 @@ body {
 
     font-family: "Times New Roman", Times, serif;
 }
+
+/* =====================================
+   LOGIN NOTICE — floats beside the card
+   card stays dead-center
+===================================== */
+
+.auth-wrap {
+
+    position: relative;
+}
+
+
+.auth-alert {
+
+    position: absolute;
+
+    top: 50%;
+
+    right: calc(50% + 275px);
+
+    transform: translateY(-50%);
+
+    max-width: 240px;
+
+    text-align: center;
+
+    margin: 0;
+}
+
+
+/* small screens: float ABOVE the card instead
+   (no room on the side) */
+
+@media (max-width: 1100px) {
+
+    .auth-alert {
+
+        top: 40px;
+
+        right: 50%;
+
+        transform: translateX(50%);
+
+        max-width: min(460px, 92%);
+    }
+}
