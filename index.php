@@ -785,7 +785,7 @@ if (isLoggedIn()) {
 
                         </form>
 
-                    <?php endif; ?>S
+                    <?php endif; ?>
 
                 <?php else: ?>
 
@@ -1031,7 +1031,7 @@ if (isLoggedIn()) {
 
                     <?php endif; ?>
 
-                                       <?php
+                                        <?php
                         $nextTIsFull    = (int)$nextT["joined_count"] >= (int)$nextT["max_players"];
                         $nextTHasJoined = in_array((int)$nextT["id"], $joinedIds);
                     ?>
