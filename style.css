@@ -4319,3 +4319,62 @@ button.op-card-btn {
 
     border-color: rgba(255, 138, 122, 0.40);
 }
+
+/* =====================================
+   SUPPORT PAGE (FAQs / Terms / Privacy)
+===================================== */
+
+.support-section {
+
+    padding: 70px 0;
+
+    scroll-margin-top: 20px;
+}
+
+.support-title {
+
+    color: var(--lime);
+
+    font-size: 32px;
+
+    letter-spacing: -1px;
+
+    margin-bottom: 28px;
+}
+
+.faq-item,
+.legal-block {
+
+    background: #171d18;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    padding: 22px 24px;
+
+    margin-bottom: 14px;
+}
+
+.faq-item h3,
+.legal-block h3 {
+
+    color: #ffffff;
+
+    font-size: 16px;
+
+    margin-bottom: 8px;
+}
+
+.faq-item p,
+.legal-block p {
+
+    color: #b7beb6;
+
+    font-size: 14px;
+}
+
+.faq-item strong {
+
+    color: var(--lime);
+}

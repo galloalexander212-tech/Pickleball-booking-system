@@ -461,11 +461,10 @@ require "database/function.php";
                 SUPPORT
             </h4>
 
-            <a href="#">FAQs</a>
-            <a href="index.php#about">How It Works</a>
-            <a href="#">Terms &amp; Conditions</a>
-            <a href="#">Privacy Policy</a>
-
+            <a href="support.php#faqs">FAQs</a>
+<a href="index.php#about">How It Works</a>
+<a href="support.php#terms">Terms &amp; Conditions</a>
+<a href="support.php#privacy">Privacy Policy</a>
         </div>
 
 

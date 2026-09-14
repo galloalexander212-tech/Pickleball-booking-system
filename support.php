@@ -2,35 +2,7 @@
 require "database/config.php";
 require "database/function.php";
 
- $page = "openplays";
-
-/* ALL upcoming open plays — no LIMIT */
- $result = $conn->query("
-    SELECT events.*, COUNT(event_joins.id) AS joined_count
-    FROM events
-    LEFT JOIN event_joins ON event_joins.event_id = events.id
-    WHERE events.type = 'open_play'
-      AND events.event_date >= CURDATE()
-    GROUP BY events.id
-    ORDER BY events.event_date ASC, events.event_time ASC
-");
- $openPlays = $result->fetch_all(MYSQLI_ASSOC);
-
- $joinedIds = [];
-
-if (isLoggedIn()) {
-
-    $stmt = $conn->prepare("SELECT event_id FROM event_joins WHERE user_id = ?");
-    $stmt->bind_param("i", $_SESSION["user_id"]);
-    $stmt->execute();
-    $joinResult = $stmt->get_result();
-
-    while ($row = $joinResult->fetch_assoc()) {
-        $joinedIds[] = (int)$row["event_id"];
-    }
-
-    $stmt->close();
-}
+ $page = "support";
 ?>
 
 <!DOCTYPE html>
@@ -42,7 +14,7 @@ if (isLoggedIn()) {
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>PICKLE | Open Plays</title>
+    <title>PICKLE | Support</title>
 
     <link rel="icon" type="image/png" href="images/logo.png">
 
@@ -99,7 +71,7 @@ if (isLoggedIn()) {
                 ABOUT US
             </a>
 
-            <a href="index.php#contact">
+            <a href="support.php" class="<?= $page === "support" ? "active" : "" ?>">
                 CONTACT US
             </a>
 
@@ -142,26 +114,30 @@ if (isLoggedIn()) {
 
     <a href="about.php">ABOUT US</a>
 
-    <a href="index.php#contact">CONTACT US</a>
+    <a href="support.php">CONTACT US</a>
 
 </div>
 
+
+<!-- =========================
+     PAGE HERO
+========================= -->
 
 <section class="page-hero">
 
     <div class="section-container">
 
         <p class="op-eyebrow">
-            MEET THE COMMUNITY
+            HELP CENTER
         </p>
 
         <h1>
-            OPEN PLAYS
+            SUPPORT
         </h1>
 
         <p class="op-desc">
-            Every upcoming open play — join one
-            and meet players in your area.
+            FAQs, terms and privacy — everything
+            you need to know.
         </p>
 
     </div>
@@ -169,124 +145,301 @@ if (isLoggedIn()) {
 </section>
 
 
-<section class="open-play">
+<!-- =========================
+     FAQs
+========================= -->
+
+<section class="support-section" id="faqs">
 
     <div class="section-container">
 
-        <?php if (empty($openPlays)): ?>
+        <h2 class="support-title">
+            FREQUENTLY ASKED QUESTIONS
+        </h2>
 
-            <p class="event-empty">
-                No upcoming open plays right now — check back soon! 🏓
+
+        <div class="faq-item">
+
+            <h3>
+                How do I book a court?
+            </h3>
+
+            <p>
+                Log in, hit <strong>BOOK A COURT</strong> (or browse the
+                Courts page), pick your court and date, then tap a free
+                time slot and confirm. Your booking appears on your
+                My Account page right away.
             </p>
 
-        <?php else: ?>
-
-            <div class="event-grid">
-
-                <?php foreach ($openPlays as $ev): ?>
-
-                    <?php
-                        $isFull    = (int)$ev["joined_count"] >= (int)$ev["max_players"];
-                        $hasJoined = in_array((int)$ev["id"], $joinedIds);
-                    ?>
-
-                    <article class="event-card<?= !empty($ev["image"]) ? " event-card-photo" : "" ?>">
-
-                        <div class="event-top">
-
-                            <span class="event-badge open_play">
-                                OPEN PLAY
-                            </span>
-
-                            <?php if ($hasJoined): ?>
-
-                                <span class="event-badge joined">
-                                    JOINED ✓
-                                </span>
-
-                            <?php endif; ?>
-
-                        </div>
+        </div>
 
 
-                        <?php if (!empty($ev["image"])): ?>
+        <div class="faq-item">
 
-                            <div class="event-image">
-                                <img src="<?= e($ev["image"]) ?>" alt="<?= e($ev["title"]) ?>">
-                            </div>
+            <h3>
+                Why does my booking say PENDING?
+            </h3>
 
-                        <?php endif; ?>
+            <p>
+                New bookings are reviewed by our admins. Once approved,
+                the status flips to <strong>CONFIRMED</strong> — you'll
+                see it change on My Account.
+            </p>
 
-
-                        <div class="event-text-plate">
-
-                            <h3><?= e($ev["title"]) ?></h3>
-
-                            <p class="event-meta">
-                                📅 <?= e(date("D, M j, Y", strtotime($ev["event_date"]))) ?>
-                                &nbsp;•&nbsp;
-                                🕐 <?= e(date("g:i A", strtotime($ev["event_time"]))) ?>
-                            </p>
-
-                            <p class="event-meta">
-                                ◉ <?= e($ev["location"]) ?>
-                            </p>
-
-                            <?php if ($ev["description"]): ?>
-
-                                <p class="event-desc"><?= e($ev["description"]) ?></p>
-
-                            <?php endif; ?>
-
-                        </div>
+        </div>
 
 
-                        <div class="event-bottom">
+        <div class="faq-item">
 
-                            <span class="event-slots">
-                                <?= (int)$ev["joined_count"] ?> / <?= (int)$ev["max_players"] ?> PLAYERS
-                            </span>
+            <h3>
+                Can I cancel a booking?
+            </h3>
+
+            <p>
+                Yes — go to My Account → MY BOOKINGS → CANCEL.
+                Cancelled slots are freed up immediately for other
+                players.
+            </p>
+
+        </div>
 
 
-                            <?php if ($hasJoined): ?>
+        <div class="faq-item">
 
-                                <span class="join-state joined">YOU'RE IN ✓</span>
+            <h3>
+                How do open plays and tournaments work?
+            </h3>
 
-                            <?php elseif ($isFull): ?>
+            <p>
+                Hit <strong>JOIN</strong> on any event card. Slots are
+                first come, first served — full events show FULL.
+                You can leave an event anytime from My Account before
+                it starts.
+            </p>
 
-                                <span class="join-state full">FULL</span>
+        </div>
 
-                            <?php elseif (!isLoggedIn()): ?>
 
-                                <a href="database/index.php?notice=login-event" class="join-btn">JOIN</a>
+        <div class="faq-item">
 
-                            <?php else: ?>
+            <h3>
+                What are the booking hours?
+            </h3>
 
-                                <form method="POST" action="database/events.php" class="join-form">
+            <p>
+                Courts run hourly slots from <strong>6:00 AM to 9:00 PM</strong>.
+                Already-booked slots and past times are shown as
+                unavailable.
+            </p>
 
-                                    <input type="hidden" name="action" value="join">
-                                    <input type="hidden" name="event_id" value="<?= (int)$ev["id"] ?>">
+        </div>
 
-                                    <button type="submit" class="join-btn">JOIN</button>
 
-                                </form>
+        <div class="faq-item">
 
-                            <?php endif; ?>
+            <h3>
+                I forgot my password!
+            </h3>
 
-                        </div>
+            <p>
+                Reach out to us through the email or phone number in
+                the footer and we'll get you back in the game.
+            </p>
 
-                    </article>
-
-                <?php endforeach; ?>
-
-            </div>
-
-        <?php endif; ?>
+        </div>
 
     </div>
 
 </section>
 
+
+<!-- =========================
+     TERMS
+========================= -->
+
+<section class="support-section" id="terms">
+
+    <div class="section-container">
+
+        <h2 class="support-title">
+            TERMS &amp; CONDITIONS
+        </h2>
+
+
+        <div class="legal-block">
+
+            <h3>
+                1. Bookings
+            </h3>
+
+            <p>
+                Court slots are reserved on a first come, first served
+                basis. A booking is pending until confirmed by an admin.
+                Only one active reservation may hold a court slot at a
+                time.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                2. Cancellations
+            </h3>
+
+            <p>
+                You may cancel a booking anytime before your slot.
+                Repeated no-shows on confirmed bookings may lead to
+                booking restrictions.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                3. Events
+            </h3>
+
+            <p>
+                Open plays and tournaments have limited slots. Joining
+                is binding — leave an event before it starts if you
+                can't make it. Organizers may cancel events; joined
+                players are notified through the platform.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                4. Conduct
+            </h3>
+
+            <p>
+                Respect the courts, the staff and fellow players.
+                Damage to court property is the responsibility of the
+                booking player. Accounts violating fair-play rules may
+                be suspended.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                5. Accounts
+            </h3>
+
+            <p>
+                Provide accurate information when registering. You are
+                responsible for activity under your account. Do not
+                share your credentials with anyone.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     PRIVACY
+========================= -->
+
+<section class="support-section" id="privacy">
+
+    <div class="section-container">
+
+        <h2 class="support-title">
+            PRIVACY POLICY
+        </h2>
+
+
+        <div class="legal-block">
+
+            <h3>
+                What we collect
+            </h3>
+
+            <p>
+                Your username, email address, a securely hashed password,
+                your court bookings and the events you join. That's it.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                How we use it
+            </h3>
+
+            <p>
+                To run the platform — showing your bookings, managing
+                event slots and letting admins keep the community fair.
+                Your password is never stored in readable form.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                What we never do
+            </h3>
+
+            <p>
+                We never sell or share your personal data with third
+                parties, and we never store plain-text passwords.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                Sessions &amp; cookies
+            </h3>
+
+            <p>
+                We use a single session cookie to keep you logged in.
+                Sessions expire automatically after 30 minutes of
+                inactivity.
+            </p>
+
+        </div>
+
+
+        <div class="legal-block">
+
+            <h3>
+                Questions about your data?
+            </h3>
+
+            <p>
+                Contact us through the email or phone number in the
+                footer and we'll help you out.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
 
 <footer>
 
@@ -349,7 +502,7 @@ if (isLoggedIn()) {
             <a href="openplays.php">Open Plays</a>
             <a href="tournaments.php">Tournaments</a>
             <a href="about.php">About Us</a>
-            <a href="index.php#contact">Contact Us</a>
+            <a href="support.php">Contact Us</a>
 
         </div>
 
@@ -361,9 +514,9 @@ if (isLoggedIn()) {
             </h4>
 
             <a href="support.php#faqs">FAQs</a>
-<a href="index.php#about">How It Works</a>
-<a href="support.php#terms">Terms &amp; Conditions</a>
-<a href="support.php#privacy">Privacy Policy</a>
+            <a href="index.php#about">How It Works</a>
+            <a href="support.php#terms">Terms &amp; Conditions</a>
+            <a href="support.php#privacy">Privacy Policy</a>
 
         </div>
 
