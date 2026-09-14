@@ -9,6 +9,31 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 /* =====================================
+   ERROR HANDLING
+   users never see raw PHP errors —
+   everything is logged privately instead
+===================================== */
+
+error_reporting(E_ALL);
+
+ini_set("display_errors", "0");
+
+ini_set("log_errors", "1");
+
+ini_set("error_log", __DIR__ . "/php-errors.log");
+
+
+set_error_handler(function ($severity, $message, $file, $line) {
+
+    /* Log everything — warnings, notices, deprecations */
+    error_log("[" . date("Y-m-d H:i:s") . "] $message in $file on line $line");
+
+    /* But never print them */
+    return true;
+});
+
+
+/* =====================================
    SESSION SECURITY
 ===================================== */
 
@@ -108,6 +133,7 @@ function getFlash() {
 
 /* Run the timeout check on every page that loads this file */
 checkSessionTimeout();
+
 
 /* =====================================
    IMAGE UPLOAD HELPER
