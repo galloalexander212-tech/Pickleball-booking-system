@@ -909,60 +909,6 @@ if (isLoggedIn()) {
 
 </section>
 
-
-<section class="contact"
-         id="contact">
-
-    <div class="contact-container">
-
-
-        <div>
-
-            <p>
-                CONTACT US
-            </p>
-
-            <h2>
-                LET'S PLAY.
-            </h2>
-
-        </div>
-
-
-        <div class="contact-details">
-
-            <div>
-
-                <span>
-                    EMAIL
-                </span>
-
-                <a href="mailto:galloalexander212@gmail.com">
-                    galloalexander212@gmail.com
-                </a>
-
-            </div>
-
-
-            <div>
-
-                <span>
-                    PHONE
-                </span>
-
-                <a href="tel:+639123456789">
-                    +63 912 345 6789
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
 <div class="modal"
      id="bookingModal">
 
